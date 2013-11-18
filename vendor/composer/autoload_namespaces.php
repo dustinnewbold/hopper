@@ -6,5 +6,5 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'hopper\\' => array($baseDir . '/src'),
+    'API\\' => array($baseDir . '/src'),
 );

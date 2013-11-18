@@ -1,6 +1,6 @@
 <?php
 
-namespace hopper\lib;
+namespace API\lib;
 
 /**
  * This class is designed to interact specifically with
@@ -10,6 +10,10 @@ namespace hopper\lib;
 class URI {
 	protected static function getURI() {
 		return str_replace('?' . $_SERVER['QUERY_STRING'], '', $_SERVER['REQUEST_URI']);
+	}
+
+	public static function complete() {
+		return $_SERVER['REQUEST_URI'];
 	}
 
 	public static function segments($segments = null) {
@@ -25,7 +29,7 @@ class URI {
 		});
 
 		$segments = array_values($segments);
-		array_unshift($segments, 'UNUSED');
+		array_unshift($segments, null);
 
 		return $segments;
 	}

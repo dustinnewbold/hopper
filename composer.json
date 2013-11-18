@@ -1,7 +1,10 @@
 {
+	"require": {
+		"ircmaxell/password-compat": "1.0.*"
+	},
     "autoload": {
         "psr-0": {
-            "hopper\\": "src/"
+            "API\\": "src/"
         }
     }
 }
