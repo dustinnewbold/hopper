@@ -68,7 +68,7 @@ class DB {
 			return array();
 		}
 
-		return (object)Response::keys_to_lower($row);
+		return Response::keys_to_lower($row);
 	}
 
 	/**
@@ -222,8 +222,20 @@ class DB {
 	public function find($table, $id) {
 		$this->count++;
 		try {
-			$statement = $this->connection->prepare('SELECT * FROM `' . $table . '` WHERE ID = :id');
-			$statement->execute(array(':id' => $id));
+			if ( gettype($id) === 'integer' && $id > 0 ) {
+				$statement = $this->connection->prepare('SELECT * FROM `' . $table . '` WHERE ID = :id');
+				$statement->execute(array(':id' => $id));
+			} else if ( gettype($id) === 'array' ) {
+				$query = 'SELECT * FROM `' . $table . '` WHERE';
+				$binds = array();
+				foreach ( $id as $key => $value ) {
+					$query .= ' `' . $key . '` = :' . strtolower($key) . ' AND';
+					$binds[':' . strtolower($key)] = $value;
+				}
+				$query = substr($query, 0, strlen($query) - 4);
+				$statement = $this->connection->prepare($query);
+				$statement->execute($binds);
+			}
 			$row = $statement->fetch(\PDO::FETCH_OBJ);
 		} catch (\PDOException $e) {
 			dd($e);
@@ -237,6 +249,13 @@ class DB {
 
 		return Response::keys_to_lower($row);
 	}
+
+	/**
+	 * Upcert will insert if the row cannot be matched automatically
+	 *
+	 * NOT YET IMPLEMENTED
+	 */
+	public function upcert($table, $binds) { }
 
 	/**
 	 * Used as a debugging tool to see how many queries are being processed
