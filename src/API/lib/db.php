@@ -219,12 +219,13 @@ class DB {
 	 *
 	 * @return (object) - Returns object based on query/data
 	 */
-	public function find($table, $id) {
+	public function find($table, $id = null) {
 		$this->count++;
 		try {
 			if ( gettype($id) === 'integer' && $id > 0 ) {
 				$statement = $this->connection->prepare('SELECT * FROM `' . $table . '` WHERE ID = :id');
 				$statement->execute(array(':id' => $id));
+				$row = $statement->fetch(\PDO::FETCH_OBJ);
 			} else if ( gettype($id) === 'array' ) {
 				$query = 'SELECT * FROM `' . $table . '` WHERE';
 				$binds = array();
@@ -235,8 +236,14 @@ class DB {
 				$query = substr($query, 0, strlen($query) - 4);
 				$statement = $this->connection->prepare($query);
 				$statement->execute($binds);
+				$row = $statement->fetch(\PDO::FETCH_OBJ);
+			} else if ( $id === null ) {
+				$statement = $this->connection->prepare('SELECT * FROM `' . $table . '`');
+				$statement->execute();
+				$row = $statement->fetchAll(\PDO::FETCH_OBJ);
+			} else {
+				return false;
 			}
-			$row = $statement->fetch(\PDO::FETCH_OBJ);
 		} catch (\PDOException $e) {
 			dd($e);
 		} catch (Exception $e) {
